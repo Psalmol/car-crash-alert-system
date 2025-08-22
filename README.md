@@ -1,3 +1,12 @@
+esp32-crash-detection/
+│── src/              # Main source code (.ino or .cpp/.h files)
+│── docs/             # Diagrams, wiring schematics, flowcharts
+│── images/           # Project photos/screenshots
+│── README.md         # Main documentation
+│── platformio.ini    
+
+
+
 # 🚗 ESP32-Based Car Crash Detection & Alert System
 
 This project implements a crash detection and alert system using an **ESP32 microcontroller**, **accelerometer/gyroscope (LSM6DS3)**, **VL53L0X proximity sensors**, and **SIM800L GSM module**.  
@@ -65,6 +74,52 @@ It detects crashes, warns about nearby obstacles, and sends GPS location via SMS
 
 ## 🚀 Getting Started
 ### Clone Repository
-```bash
 git clone https://github.com/psalmol/esp32-crash-detection.git
 cd esp32-crash-detection
+
+##  🔄 System Flow
+
+1. **Startup**
+   - ESP32 initializes all sensors (LSM6DS3, VL53L0Xs, SIM800L, GPS if enabled).
+   - Each VL53L0X is assigned a unique I2C address using XSHUT pins.
+
+2. **Continuous Monitoring**
+   - IMU (LSM6DS3) monitors acceleration and angular velocity.
+   - VL53L0X sensors continuously measure distances (front, left, right, rear).
+
+3. **Crash Detection**
+   - If acceleration exceeds threshold → crash detected.
+   - ESP32 triggers GSM call/SMS alert via SIM800L.
+   - Alert message includes predefined text (and GPS location if active).
+
+4. **Proximity Warning**
+   - If any VL53L0X reading < threshold distance → buzzer activates.
+   - Buzzer deactivates once distance is safe.
+
+5. **GPS On-Demand**
+   - SIM800L listens for incoming SMS.
+   - If message contains keyword **“GPS”** → ESP32 retrieves current location.
+   - Sends SMS with Google Maps link:  
+     `https://maps.google.com/?q=latitude,longitude`
+
+6. **Standby / Repeat**
+   - Loop continues until power is turned off.
+
+ 
+ ## PlatformIO Project Configuration File
+
+[env:esp32dev]
+platform = espressif32
+board = esp32dev
+framework = arduino
+
+; Serial monitor speed
+monitor_speed = 115200
+
+; Libraries used
+lib_deps =
+    adafruit/Adafruit Unified Sensor @ ^1.1.14
+    adafruit/Adafruit LSM6DS @ ^3.0.7
+    adafruit/Adafruit VL53L0X @ ^1.3.1
+    mikalhart/TinyGPSPlus @ ^1.0.3
+
