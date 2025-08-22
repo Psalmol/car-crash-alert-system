@@ -1,3 +1,4 @@
+---
 esp32-crash-detection/
 │── src/              # Main source code (.ino or .cpp/.h files)
 │── docs/             # Diagrams, wiring schematics, flowcharts
